@@ -6,6 +6,7 @@ import { paginate } from "../utils/paginate";
 import ListGroup from "./common/listGroup";
 import MoviesTable from "./moviesTable";
 import PropTypes from "prop-types";
+import _ from "lodash";
 
 class Movies extends Component {
   state = {
@@ -13,7 +14,8 @@ class Movies extends Component {
     pageSize: 4,
     currentPage: 1,
     genres: [],
-    selectedItem: {}
+    selectedItem: {},
+    sortColumn: { path: "title", order: "asc" }
   };
 
   componentDidMount() {
@@ -42,8 +44,8 @@ class Movies extends Component {
     this.setState({ selectedItem: genre, currentPage: 1 });
   };
 
-  handleSort = path => {
-    console.log(path);
+  handleSort = sortColumn => {
+    this.setState({ sortColumn: sortColumn });
   };
 
   render() {
@@ -53,7 +55,8 @@ class Movies extends Component {
       pageSize,
       currentPage,
       movies: allMovies,
-      selectedItem
+      selectedItem,
+      sortColumn
     } = this.state;
     if (count === 0) return <p>There are no movies in the database.</p>;
 
@@ -61,7 +64,9 @@ class Movies extends Component {
       ? allMovies.filter(m => m.genre._id === selectedItem._id)
       : allMovies;
 
-    const movies = paginate(filtered, currentPage, pageSize);
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+
+    const movies = paginate(sorted, currentPage, pageSize);
 
     return (
       <div>
@@ -82,6 +87,7 @@ class Movies extends Component {
               onDelete={this.handleDelete}
               onLike={this.handleLike}
               onSort={this.handleSort}
+              sortColumn={sortColumn}
             />
             <Pagination
               itemsCount={filtered.length}
