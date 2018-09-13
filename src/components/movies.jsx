@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import Like from "./common/like";
 import { getMovies } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate";
 import ListGroup from "./common/listGroup";
+import MoviesTable from "./moviesTable";
 import PropTypes from "prop-types";
 
 class Movies extends Component {
@@ -22,7 +22,7 @@ class Movies extends Component {
   }
 
   handleDelete = movie => {
-    const movies = this.state.movies.filter(m => m.genre._id !== movie._id);
+    const movies = this.state.movies.filter(m => m._id !== movie._id);
     this.setState({ movies });
   };
 
@@ -42,9 +42,14 @@ class Movies extends Component {
     this.setState({ selectedItem: genre, currentPage: 1 });
   };
 
+  handleSort = path => {
+    console.log(path);
+  };
+
   render() {
     const { length: count } = this.state.movies;
     const {
+      genres,
       pageSize,
       currentPage,
       movies: allMovies,
@@ -60,56 +65,25 @@ class Movies extends Component {
 
     return (
       <div>
-        <p className="text-center">
-          Showing {filtered.length} movies in the database.
-        </p>
         <div className="row">
           <div className="col-md-3">
             <ListGroup
-              items={this.state.genres}
+              items={genres}
               selectedItem={selectedItem}
               onItemSelect={this.handleItemSelect}
             />
           </div>
           <div className="col-md-9">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Genre</th>
-                  <th>Stock</th>
-                  <th>Rate</th>
-                  <th />
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {movies.map(movie => (
-                  <tr key={movie._id}>
-                    <td>{movie.title}</td>
-                    <td>{movie.genre.name}</td>
-                    <td>{movie.numberInStock}</td>
-                    <td>{movie.dailyRentalRate}</td>
-                    <td>
-                      <Like
-                        liked={movie.liked}
-                        onClick={() => this.handleLike(movie)}
-                      />
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => this.handleDelete(movie)}
-                        className="btn btn-danger btn-sm"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <p className="text-center">
+              Showing {filtered.length} movies in the database.
+            </p>
+            <MoviesTable
+              movies={movies}
+              onDelete={this.handleDelete}
+              onLike={this.handleLike}
+              onSort={this.handleSort}
+            />
             <Pagination
-              className="text-center"
               itemsCount={filtered.length}
               pageSize={pageSize}
               currentPage={currentPage}

@@ -19,7 +19,7 @@ class ListGroup extends Component {
                 item[valueProperty] ? item[valueProperty] : item[textProperty]
               }
               className={
-                item[textProperty] === selectedItem
+                item[textProperty] === selectedItem[textProperty]
                   ? "list-group-item list-group-item-action active"
                   : "list-group-item list-group-item-action"
               }
